@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>EZ redux</title>
+    </head>
+    <body>
+        <script>
+            const createStore = (reducer, initialState) => {
+                let state = initialState;
+                return {
+                    dispatch: action => { state = reducer(state, action) },
+                    getState: () => state
+                }
+            }
+
+            const initialState = {
+                value: 0,
+            }
+
+            const reducer = (state, action) => {
+                switch(action.type) {
+                    case 'todo/itemAdded':
+                        return {
+                            ...state,
+                            value: state.value + 1
+                        }
+                    case 'todo/itemRemoved':
+                        return {
+                            ...state,
+                            value: state.value - 1
+                        }
+                    default:
+                        return state;
+                }
+            }
+
+            const store = createStore(reducer, initialState);
+
+            document.addEventListener("DOMContentLoaded", function() {
+                document.getElementById('addButton')
+                    .addEventListener('click', e => {
+                        e.preventDefault();
+                        store.dispatch({type: 'todo/itemAdded'});
+                        render();
+                    });
+                document.getElementById('removeButton')
+                    .addEventListener('click', e => {
+                        e.preventDefault();
+                        store.dispatch({type: 'todo/itemRemoved'});
+                        render();
+                    })
+            });
+
+            function render() {
+                const valueElement = document.getElementById('counter');
+                const state = store.getState();
+                console.log(`state: ${JSON.stringify(state, null, 4)}`);
+                valueElement.textContent = state.value;
+            }
+        </script>
+        <div>Counter pressed <span id="counter">0</span> times
+            <button id="addButton">+</button>
+            <button id="removeButton">-</button>
+        </div>
+    </body>
+</html>
